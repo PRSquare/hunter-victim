@@ -2,14 +2,16 @@ import numpy as np
 import pyqtgraph.opengl as gl
 import random
 
+# 3D object class
 class THDobject:
     def __init__(self, filename, color):
         self.color = color
         self.cords = []
         self.pos = [0, 0, 0]
-        self.objParser(filename)
-        self.mesh = gl.GLMeshItem(vertexes=np.array(self.cords), drawEdges=True, color=self.color)
+        self.objParser(filename) # Parsing .obj file
+        self.mesh = gl.GLMeshItem(vertexes=np.array(self.cords), drawEdges=True, color=self.color) # Creating mesh
     
+    # Parsin .obj file
     def objParser(self, filename):
         inFile = open(filename, 'r')
         vertexes = []
@@ -17,15 +19,19 @@ class THDobject:
         normals = []
 
         for line in inFile:
+            # Vertexes
             if "v " in line:
                 vLine = line.split(" ")
                 vertexes.append([float(vLine[1]), float(vLine[2]), float(vLine[3])])
+            # UV cords
             if "vt " in line:
                 vtLine = line.split(" ")
                 uvCords.append([float(vtLine[1]), float(vtLine[2])])
+            # Normale vertexes
             if "vn " in line:
                 vnLine = line.split(" ")
                 normals.append([float(vnLine[1]), float(vnLine[2]), float(vnLine[3])])
+            # Indexes
             if "f " in line:
                 inLine = line.split(" ")
                 a = inLine[1].split("/")
@@ -74,17 +80,22 @@ class THDobject:
         
         self.cords = newCords
         self.update()
-           
+ 
 
+# Getting rand value
 mrand = lambda maxval: random.random()*maxval*2 - maxval
+# Changing value to simulate mutation
 genMutation = lambda gen, rng: gen + random.random()*rng*2 - rng
+# Length between two points
 pathL = lambda pos1, pos2: np.sqrt((pos2[0]-pos1[0])*(pos2[0]-pos1[0]) + (pos2[1]-pos1[1])*(pos2[1]-pos1[1]))
-def col (pos1, pos2, rad = 5): 
+
+def col (pos1, pos2, rad = 5): # Colision check
     return abs(pos1[0] - pos2[0]) <= rad and abs(pos1[1] - pos2[1]) <= rad
 
-
+# Default size of landscape
 landSize = 100
 
+# Base class for animals (fox/bunny)
 class alive(THDobject):
     def __init__(self, name, color, mHunger, prodTime, srchRadius, spd, strvLvl, prdLvl):
         super().__init__(name, color)
@@ -136,10 +147,8 @@ class alive(THDobject):
         pathLength = pathL(self.pos, self.moveDir)
         a = x - self.pos[0]
         b = y - self.pos[1]
-        #print(a, " ", b, ' ', pathLength)
         if pathLength != 0:
             self.mvVector = [a/pathLength, b/pathLength]
-        #self.rotate(b/pathLength)
         
     def log_update(self): 
         self.walking()
@@ -156,9 +165,7 @@ class alive(THDobject):
     def walking(self):
         mx = self.pos[0]
         my = self.pos[1]
-        # if self.hunger/self.maxHunger > 0.5:
-            # self.color = (self.hunger/self.maxHunger, self.natureColor[1], self.natureColor[2], self.natureColor[3])
-            #
+        
         if col(self.pos, self.moveDir, 0.4) == False:
             if self.pos[0] < landSize and self.pos[0] > -landSize :
                 mx = self.pos[0] + self.speed *self.mvVector[0]
@@ -229,6 +236,7 @@ class fox(alive):
             bunny.death()
             self.eat()
 
+# Class that consist all information about current world 
 class world:
     def __init__(self, window, worldSize = 1, bPopulation=10, fPopulation=3, foodCount=10, 
                  foodProdSpeed=10, bunnyDefHunger = 200, foxDefHunger=100):
@@ -273,6 +281,7 @@ class world:
             window.addItem(a.mesh)
     
     def update(self):
+        # Creating new bushes
         if self.nowFoodState > self.foodSpeed:
             self.nowFoodState = 0
             newBush = bush()
@@ -281,29 +290,37 @@ class world:
             self.bushes.append(newBush)
         
         self.nowFoodState += 1
+
+        # Values, that will be updated
         nbGen = self.bPop
         nfGen = self.fPop
         nbushes = self.bushes
         
+        # Deleting bush if it is eaten
         for a in self.bushes:
             if a.exist == False:
                 nbushes.remove(a)
                 self.window.removeItem(a.mesh)
         
+        # Deleting bunny if it is dead
         for a in self.bPop:
             a.log_update()
             if a.isAlive==False:
                 self.window.removeItem(a.mesh)
                 nbGen.remove(a)
                 
+        # ============================================== BUNNIES LOGIC ==============================================
         for a in self.bPop:
+            # Skip, if it is dead
             if a.isAlive == False:
                 continue
+            # Hunger check
             if a.inProcess == False and a.hunger > a.maxHunger*(a.starvationStart/100):
                 for b in self.bushes:
                     if(a.hunt(b)):
                         b.exist = False
                         break
+            # Selecting a partner
             if a.inProcess == False and a.bussy == False and a.pTimer > a.produceTime and a.hunger < a.maxHunger*(a.prodStart/100):
                 for b in nbGen:
                     if a == b:
@@ -322,11 +339,14 @@ class world:
                         a.selectedPartner = b
                         b.selectedPartner = a
                         break
+            # Reproduction
             if a.inProcess == True:
+                # Death of partner
                 if a.selectedPartner.isAlive == False:
                     a.inProcess = False
                     a.color = a.natureColor
                     print("Partner is dead!")
+                # Borning
                 if a.momy == True:
                     if col(a.pos, a.selectedPartner.pos):
                         a.produce()
@@ -338,18 +358,23 @@ class world:
                         newBunny.move(a.pos)
                         nbGen.append(newBunny)
                         self.window.addItem(newBunny.mesh)
-                        #a.selectedPartner = bunny()
-                        
+        # ============================================================================================
+
+        # ============================================== FOXES LOGIC ==============================================
         for a in self.fPop:
             a.log_update()
+            # Delete, if it is dead
             if(a.isAlive==False):
                 self.window.removeItem(a.mesh)
                 nfGen.remove(a)
+
         for a in self.fPop:
+            # Hunger check
             if a.inProcess == False and a.hunger > a.maxHunger*(a.starvationStart/100):
                 for b in nbGen:
                     if col(a.pos, b.pos, a.search_radius):
                         a.hunt(b)
+            # Selecting a partner
             if a.inProcess == False and a.bussy == False and a.pTimer > a.produceTime and a.hunger < a.maxHunger*(a.prodStart/100):
                 for b in nfGen:
                     if a == b:
@@ -368,11 +393,14 @@ class world:
                         a.selectedPartner = b
                         b.selectedPartner = a
                         break
+            # Reproduction
             if a.inProcess == True:
+                # Death of partner
                 if a.selectedPartner.isAlive == False:
                     a.inProcess = False
                     a.color = a.natureColor
                     print("Partner is dead!")
+                # Borning
                 if a.momy == True:
                     if col(a.pos, a.selectedPartner.pos):
                         a.produce()
@@ -384,6 +412,9 @@ class world:
                         newFox.move(a.pos)
                         nfGen.append(newFox)
                         self.window.addItem(newFox.mesh)
+        # ============================================================================================
+
+        # Taking information about generation after update
         self.bPop = nbGen
         self.fPop = nfGen
         self.bushes = nbushes
