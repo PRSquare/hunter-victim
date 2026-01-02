@@ -6,6 +6,14 @@ This is a small student project. It simulates a victim-hunter model. You have a 
 ## How to run
 Simply run `python main.py` or `make start` command
 
+## Translation
+To change language run 
+```
+make changelang lang={lang_code}
+```
+where `lang_code` is your language code. for example `en` or `ru`
+now supports only **engilsh** and **russian**
+
 ## Dependencies
 + `pyqtgraph`
 + `PyQt6`

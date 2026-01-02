@@ -4,6 +4,11 @@ import sys
 import pyqtgraph.opengl as gl
 from PyQt6 import QtCore, QtWidgets
 import pyqtgraph as pg
+import texts
+import init
+
+tr = texts.getText(init.lang)
+print(tr)
 
 # Main window class
 class Ui_MainWindow(QtWidgets.QWidget):
@@ -26,7 +31,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.addLineNames()
         
         # CheckBox to stop world after all foxes/bunnies are dead
-        self.cbStopWorld = QtWidgets.QCheckBox("Остановить мир после смерти всех Лис/Зайцев", self)
+        self.cbStopWorld = QtWidgets.QCheckBox(tr["stop-the-word"], self)
         self.cbStopWorld.move(600, 470)
         self.cbStopWorld.stateChanged.connect(self.changeStopWorld)
         
@@ -84,19 +89,19 @@ class Ui_MainWindow(QtWidgets.QWidget):
     
     # Inicialisation of line names  
     def addLineNames(self):
-        self.lbl.append(QtWidgets.QLabel("Размер Мира [1]", self))
+        self.lbl.append(QtWidgets.QLabel(tr["word-size"], self))
         self.lbl[0].move(650, 500)
-        self.lbl.append(QtWidgets.QLabel("Популяция Зайцев [20]", self))
+        self.lbl.append(QtWidgets.QLabel(tr["rabbit-population"], self))
         self.lbl[1].move(650, 540)
-        self.lbl.append(QtWidgets.QLabel("Популяция Лис [4]", self))
+        self.lbl.append(QtWidgets.QLabel(tr["foxes-population"], self))
         self.lbl[2].move(650, 580)
-        self.lbl.append(QtWidgets.QLabel("Кол-во Еды [20]", self))
+        self.lbl.append(QtWidgets.QLabel(tr["food-amount"], self))
         self.lbl[3].move(650, 620)
-        self.lbl.append(QtWidgets.QLabel("Темп Роста Еды [10]", self))
+        self.lbl.append(QtWidgets.QLabel(tr["food-growth-speed"], self))
         self.lbl[4].move(650, 660)
-        self.lbl.append(QtWidgets.QLabel("Запас Еды Зайцев [200]", self))
+        self.lbl.append(QtWidgets.QLabel(tr["rabbit-stomach-capacity"], self))
         self.lbl[5].move(650, 700)
-        self.lbl.append(QtWidgets.QLabel("Запас Еды Лис [100]", self))
+        self.lbl.append(QtWidgets.QLabel(tr["fox-stomach-capacity"], self))
         self.lbl[6].move(650, 740)
         
 
