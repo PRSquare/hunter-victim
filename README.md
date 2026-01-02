@@ -1,6 +1,8 @@
 # Rabits and foxes simulation
 This is a small student project. It simulates a victim-hunter model. You have a controls over the poulation, amount of food etc.
 
+![screenshot](images/screenshot.png)
+
 ## How to run
 Simply run `python main.py` or `make start` command
 
