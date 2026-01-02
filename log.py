@@ -56,7 +56,7 @@ class THDobject:
         self.update()
                 
     def rotate(self, a):
-        rotMatX = np.mat([
+        rotMatX = np.asmatrix([
             [np.cos(a), -np.sin(a), 0],
             [np.sin(a), np.cos(a), 0],
             [0, 0, 1]
@@ -89,8 +89,8 @@ genMutation = lambda gen, rng: gen + random.random()*rng*2 - rng
 # Length between two points
 pathL = lambda pos1, pos2: np.sqrt((pos2[0]-pos1[0])*(pos2[0]-pos1[0]) + (pos2[1]-pos1[1])*(pos2[1]-pos1[1]))
 
-def col (pos1, pos2, rad = 5): # Colision check
-    return abs(pos1[0] - pos2[0]) <= rad and abs(pos1[1] - pos2[1]) <= rad
+def col (pos1, pos2, red = 5.0): # Colision check
+    return abs(pos1[0] - pos2[0]) <= red and abs(pos1[1] - pos2[1]) <= red
 
 # Default size of landscape
 landSize = 100
@@ -192,16 +192,16 @@ class alive(THDobject):
 
 class landsacpe(THDobject):
     def __init__(self):
-        super().__init__("landscape.obj", (0, 1, 0.1, 1))
+        super().__init__("res/landscape.obj", (0, 1, 0.1, 1))
         
 class bush(THDobject):
     def __init__(self):
-        super().__init__("bush.obj", (0, 0.7, 0.5, 1))
+        super().__init__("res/bush.obj", (0, 0.7, 0.5, 1))
         self.exist = True
         
 class bunny(alive):
     def __init__(self, mHunger = 200, prodTime = 100, srchRadius = 30, spd = 1.5, strvLvl=30, prdLvl = 40):
-        super().__init__("bunny.obj", (0.2, 0.2, 0.2, 1), mHunger, prodTime, srchRadius, spd, strvLvl, prdLvl)
+        super().__init__("res/bunny.obj", (0.2, 0.2, 0.2, 1), mHunger, prodTime, srchRadius, spd, strvLvl, prdLvl)
     
     def hunt(self, food):
         if self.selectedFood.exist == False:
@@ -221,7 +221,7 @@ class bunny(alive):
 
 class fox(alive):
     def __init__(self, mHunger = 100, prodTime = 150, srchRadius = 40, spd = 2, strvLvl=30, prdLvl = 50):
-        super().__init__("fox.obj", (1, 0.4, 0, 1), mHunger, prodTime, srchRadius, spd, strvLvl, prdLvl)
+        super().__init__("res/fox.obj", (1, 0.4, 0, 1), mHunger, prodTime, srchRadius, spd, strvLvl, prdLvl)
         
     def hunt(self, bunny):
         if bunny.isAlive == False:

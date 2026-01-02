@@ -1,7 +1,8 @@
+from pyqtgraph.graphicsItems.TargetItem import string
 import log
 import sys
 import pyqtgraph.opengl as gl
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 import pyqtgraph as pg
 
 # Main window class
@@ -56,8 +57,11 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.button_start = QtWidgets.QPushButton('Start', self)	# Button to start the world
         
         self.inLines = []
+        lineInputValues = [1, 20, 4, 20, 10, 200, 100];
         for i in range(7):
-            self.inLines.append(QtWidgets.QLineEdit(self)) 
+            lineInput = QtWidgets.QLineEdit(self);
+            self.inLines.append(lineInput) 
+            self.inLines[i].setText(str(lineInputValues[i]))
             self.inLines[i].move(800, 500 + i*40)
         
         # Inicialisation of buttons
@@ -176,4 +180,4 @@ if __name__ == '__main__':
     t.start(100) 
 
     # Exit
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
